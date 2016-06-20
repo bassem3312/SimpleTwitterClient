@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SimpleTwitterClient</string>
+    <string name="twitter_consumer_key">cm8I6trvcbnVVRVBnhBRdiHiC</string>
+    <string name="twitter_consumer_secret">8bKaQc7E8kYsU3Vs6DJBJ5Ehv9SAWBIbuQ6XKkc4ASZPTOxG6N</string>
 </resources>
