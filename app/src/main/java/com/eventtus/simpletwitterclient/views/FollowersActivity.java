@@ -1,5 +1,6 @@
 package com.eventtus.simpletwitterclient.views;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -132,6 +133,10 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
                         GeneralMethods.printLog("=====", "item selected" + position);
+                        TwitterUser selectedTwitterUser = twitterFollowersUsersAdapter.getTwittersList(position);
+                        Intent intentSelectedUserProfile = new Intent(FollowersActivity.this, FollowerUserProfileActivity.class);
+                        intentSelectedUserProfile.putExtra(FollowerUserProfileActivity.SELECTED_USER_FLAG, selectedTwitterUser);
+                        FollowersActivity.this.startActivity(intentSelectedUserProfile);
                     }
                 })
         );
