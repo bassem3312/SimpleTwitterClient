@@ -53,6 +53,7 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
     private long nextCursor;
     private TwitterFollowersUsersAdapter twitterFollowersUsersAdapter;
     private View progressIndecator;
+    private View circularProgressLoadingFirstTime;
 
     public void setProfileImage() {
         Target target = new Target() {
@@ -87,8 +88,8 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         setContentView(R.layout.activity_followers);
         currentTwitterUser = SharedPreferencesHelper.getSavedTwitterUserFrom(FollowersActivity.this);
         initToolBar(currentTwitterUser.getName());
-        initRecycleList();
-        iniHorizontalLoadMoreProgressIndicator();
+        initFollowersRecycleList();
+        initHorizontalLoadMoreProgressIndicator();
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key), getString(R.string.twitter_consumer_secret));
         Fabric.with(this, new Twitter(authConfig));
         cursor = -1;
@@ -96,18 +97,18 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
 
     }
 
-    private void iniHorizontalLoadMoreProgressIndicator() {
-        progressIndecator = findViewById(R.id.progressFollowersLoadMore);
+    private void initHorizontalLoadMoreProgressIndicator() {
+        progressIndecator = findViewById(R.id.progress_followers_load_more);
+        circularProgressLoadingFirstTime = findViewById(R.id.progress_first_time_loading);
+        circularProgressLoadingFirstTime.setVisibility(View.VISIBLE);
 
     }
 
     public void initToolBar(String title) {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar_followers_list);
         toolbar.setTitle(title);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(com.twitter.sdk.android.R.drawable.abc_ic_ab_back_mtrl_am_alpha);
         setProfileImage();
-//        toolbar.setLogo(R.mipmap.ic_launcher);
         toolbar.setNavigationOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -118,11 +119,11 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         );
     }
 
-    private void initRecycleList() {
-        swipeRefreshLayoutFollowersList = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayoutFollowersList);
+    private void initFollowersRecycleList() {
+        swipeRefreshLayoutFollowersList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_followers_list);
         swipeRefreshLayoutFollowersList.setOnRefreshListener(FollowersActivity.this);
         swipeRefreshLayoutFollowersList.setColorSchemeResources(R.color.colorAccent);
-        recFollowersList = (RecyclerView) findViewById(R.id.cardFollowersList);
+        recFollowersList = (RecyclerView) findViewById(R.id.lst_followers);
         recFollowersList.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -165,6 +166,7 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
                 Toast.makeText(FollowersActivity.this, arg0.getMessage(), Toast.LENGTH_LONG).show();
                 swipeRefreshLayoutFollowersList.setRefreshing(false);
                 progressIndecator.setVisibility(View.GONE);
+                circularProgressLoadingFirstTime.setVisibility(View.GONE);
             }
 
             @Override
@@ -213,7 +215,6 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         GeneralMethods.printLog("Response is>>>>>>>>>", result);
         Gson gson = new Gson();
         FollowersResult response = gson.fromJson(result, FollowersResult.class);
-//        Log.e("=name of user 0", response.getUsers().get(0).getName());
         nextCursor = response.getNextCursor();
         if (cursor == -1) {
             twitterFollowersUsersAdapter = new TwitterFollowersUsersAdapter(FollowersActivity.this, response.getUsers());
@@ -223,9 +224,9 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         }
         swipeRefreshLayoutFollowersList.setRefreshing(false);
         progressIndecator.setVisibility(View.GONE);
-
-
+        circularProgressLoadingFirstTime.setVisibility(View.GONE);
     }
+
 
 
     @Override

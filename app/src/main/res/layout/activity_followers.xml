@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/tw__light_gray">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_followers_list"
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:layout_alignParentTop="true"
@@ -14,25 +14,31 @@
         android:titleTextColor="@color/dgts__text_light" />
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayoutFollowersList"
+        android:id="@+id/swipe_refresh_layout_followers_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@+id/toolbar_followers_list">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/cardFollowersList"
+            android:id="@+id/lst_followers"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin" />\
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-        android:id="@+id/progressFollowersLoadMore"
-        style="@style/horizontalProgress"
+    <fr.castorflex.android.smoothprogressbar.SmoothProgressBar xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/progress_followers_load_more"
+        style="@style/HorizontalProgressProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:indeterminate="true"
-        app:mpb_progressStyle="horizontal" />
+        android:indeterminate="true" />
+    <include
+        android:id="@+id/progress_first_time_loading"
+        layout="@layout/loading_circular_progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 </RelativeLayout>

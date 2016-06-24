@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/tw__transparent"
+    android:orientation="vertical">
+
+    <fr.castorflex.android.circularprogressbar.CircularProgressBar
+        android:id="@+id/progress_header"
+        style="@style/CircularThemeProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/img_header_logo"
+        android:layout_alignLeft="@+id/img_header_logo"
+        android:layout_alignRight="@+id/img_header_logo"
+        android:layout_alignTop="@+id/img_header_logo"
+        android:indeterminate="true"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/img_header_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:padding="10dp"
+        android:src="@drawable/ic_app_logo_loading_bg" />
+</RelativeLayout>
