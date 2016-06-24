@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.eventtus.simpletwitterclient.Models.TwitterUser;
 import com.eventtus.simpletwitterclient.R;
+import com.eventtus.simpletwitterclient.helpers.RoundedCornersTransformation;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -20,11 +21,16 @@ import java.util.List;
 public class TwitterFollowersUsersAdapter extends RecyclerView.Adapter<TwitterFollowersUsersAdapter.TwitterFollowersUsersHolders> {
 
     private final Context context;
+    private final RoundedCornersTransformation roundedCornersTransformation;
     private List<TwitterUser> twitterFollowers;
 
     public TwitterFollowersUsersAdapter(Context currentContext, List<TwitterUser> contactList) {
         this.twitterFollowers = contactList;
-        this.context=currentContext;
+        this.context = currentContext;
+        final int radius = 15;
+        final int margin = 10;
+        roundedCornersTransformation = new RoundedCornersTransformation(radius, margin);
+
     }
 
     @Override
@@ -36,13 +42,14 @@ public class TwitterFollowersUsersAdapter extends RecyclerView.Adapter<TwitterFo
     public void onBindViewHolder(TwitterFollowersUsersAdapter.TwitterFollowersUsersHolders currentTwitterFollowersUsersHolders, int i) {
         TwitterUser currentTwitterUser = twitterFollowers.get(i);
         currentTwitterFollowersUsersHolders.tvFollowersFullName.setText(currentTwitterUser.getName());
-        currentTwitterFollowersUsersHolders.tvHandle.setText("@"+currentTwitterUser.getScreenName());
+        currentTwitterFollowersUsersHolders.tvHandle.setText("@" + currentTwitterUser.getScreenName());
         if (currentTwitterUser.getDescription() == null || currentTwitterUser.getDescription().isEmpty()) {
+            currentTwitterFollowersUsersHolders.tvBio.setVisibility(View.GONE);
         } else {
             currentTwitterFollowersUsersHolders.tvBio.setText(currentTwitterUser.getDescription());
             currentTwitterFollowersUsersHolders.tvBio.setVisibility(View.VISIBLE);
         }
-        Picasso.with(context).load(currentTwitterUser.getProfileImageUrl()).placeholder(R.drawable.ic_profile_dummy).into(currentTwitterFollowersUsersHolders.imgFollowerProfile);
+        Picasso.with(context).load(currentTwitterUser.getProfileImageUrl()).transform(roundedCornersTransformation).placeholder(R.drawable.ic_profile_dummy).into(currentTwitterFollowersUsersHolders.imgFollowerProfile);
 
     }
 
@@ -60,6 +67,10 @@ public class TwitterFollowersUsersAdapter extends RecyclerView.Adapter<TwitterFo
         notifyDataSetChanged();
     }
 
+    public TwitterUser getTwittersList(int position) {
+        return twitterFollowers.get(position);
+    }
+
     public static class TwitterFollowersUsersHolders extends RecyclerView.ViewHolder {
         protected ImageView imgFollowerProfile;
         protected TextView tvFollowersFullName;
@@ -69,9 +80,9 @@ public class TwitterFollowersUsersAdapter extends RecyclerView.Adapter<TwitterFo
         public TwitterFollowersUsersHolders(View v) {
             super(v);
             imgFollowerProfile = (ImageView) v.findViewById(R.id.img_follower_profile);
-            tvFollowersFullName = (TextView) v.findViewById(R.id.txtFollowerFullName);
-            tvHandle = (TextView) v.findViewById(R.id.txtFollowerHandel);
-            tvBio = (TextView) v.findViewById(R.id.txtBio);
+            tvFollowersFullName = (TextView) v.findViewById(R.id.txt_follower_full_name);
+            tvHandle = (TextView) v.findViewById(R.id.txt_follower_handel);
+            tvBio = (TextView) v.findViewById(R.id.txt_bio);
         }
     }
 }
