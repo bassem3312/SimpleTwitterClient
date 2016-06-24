@@ -22,6 +22,7 @@ import com.eventtus.simpletwitterclient.controls.RecyclerItemClickListener;
 import com.eventtus.simpletwitterclient.controls.adapters.TwitterFollowersUsersAdapter;
 import com.eventtus.simpletwitterclient.controls.twitter.TwitterFollowersApiClient;
 import com.eventtus.simpletwitterclient.helpers.GeneralMethods;
+import com.eventtus.simpletwitterclient.helpers.InternalStorage;
 import com.eventtus.simpletwitterclient.helpers.SharedPreferencesHelper;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -93,8 +94,20 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key), getString(R.string.twitter_consumer_secret));
         Fabric.with(this, new Twitter(authConfig));
         cursor = -1;
+        fillFollowersListFromCashing();
         showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), -1, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
 
+    }
+
+    private void fillFollowersListFromCashing() {
+        try {
+            FollowersResult cachedNews = (FollowersResult) InternalStorage.readObject(FollowersActivity.this, currentTwitterUser.getScreenName());
+            twitterFollowersUsersAdapter = new TwitterFollowersUsersAdapter(FollowersActivity.this, cachedNews.getUsers());
+            recFollowersList.setAdapter(twitterFollowersUsersAdapter);
+            progressIndecator.setVisibility(View.GONE);
+            circularProgressLoadingFirstTime.setVisibility(View.GONE);
+        } catch (Exception ex) {
+        }
     }
 
     private void initHorizontalLoadMoreProgressIndicator() {
@@ -215,8 +228,10 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         GeneralMethods.printLog("Response is>>>>>>>>>", result);
         Gson gson = new Gson();
         FollowersResult response = gson.fromJson(result, FollowersResult.class);
+
         nextCursor = response.getNextCursor();
         if (cursor == -1) {
+            addFollowingResponseToCash(response);
             twitterFollowersUsersAdapter = new TwitterFollowersUsersAdapter(FollowersActivity.this, response.getUsers());
             recFollowersList.setAdapter(twitterFollowersUsersAdapter);
         } else {
@@ -227,7 +242,13 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         circularProgressLoadingFirstTime.setVisibility(View.GONE);
     }
 
-
+    private void addFollowingResponseToCash(FollowersResult response) {
+        try {
+            InternalStorage.addTwitterFollowesWriteObject(FollowersActivity.this, currentTwitterUser.getScreenName(), response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void onRefresh() {
