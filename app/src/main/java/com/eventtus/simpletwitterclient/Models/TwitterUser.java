@@ -2,11 +2,12 @@ package com.eventtus.simpletwitterclient.Models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 //
-public class TwitterUser {
+public class TwitterUser implements Serializable{
 
     @SerializedName("id")
     private Long id;
@@ -531,7 +532,7 @@ public class TwitterUser {
      */
     //@SerializedName("profile_image_url")
     public String getProfileImageUrl() {
-        return profileImageUrl;
+        return profileImageUrl.replace("_normal", "");
     }
 
     /**

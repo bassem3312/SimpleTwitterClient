@@ -3,6 +3,8 @@ package com.eventtus.simpletwitterclient.views;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,6 +57,7 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
     private ImageView imgProfile;
     private AppBarLayout appBarLayoutUserProfile;
     private View circularProgressLoadingFirstTime;
+    private CoordinatorLayout coordinateLayoutUserProfile;
 
 
     @Override
@@ -63,6 +66,8 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
         setContentView(R.layout.activity_user_profile);
         imgVUserCover = (ImageView) findViewById(R.id.imgv_user_cover);
         currentFollowedUser = (TwitterUser) getIntent().getSerializableExtra(SELECTED_USER_FLAG);
+        coordinateLayoutUserProfile = (CoordinatorLayout) findViewById(R.id.coordinate_layout_user_profile);
+
         Picasso.with(FollowerUserProfileActivity.this).load(currentFollowedUser.getProfileBannerUrl()).into(imgVUserCover);
         GeneralMethods.printLog("====Current user", currentFollowedUser.getName());
         currentTwitterUser = SharedPreferencesHelper.getSavedTwitterUserFrom(FollowerUserProfileActivity.this);
@@ -116,6 +121,10 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
     }
 
     private void showSelectedUserTweets(long followerID, long userID, String username, final long count, String authToken, String authSecret) {
+        if(!GeneralMethods.isNetworkAvailable(FollowerUserProfileActivity.this)){
+            ShowConnectionErrorSnackBar(getString(R.string.no_internet_connection_error_message));
+            return;
+        }
         TwitterAuthToken twitterAuthToken = new TwitterAuthToken(authToken, authSecret);
         TwitterSession session = new TwitterSession(twitterAuthToken, userID, username);
 
@@ -128,6 +137,7 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
                 GeneralMethods.printLog("====failure", arg0.getMessage());
                 Toast.makeText(FollowerUserProfileActivity.this, arg0.getMessage(), Toast.LENGTH_LONG).show();
                 circularProgressLoadingFirstTime.setVisibility(View.GONE);
+                ShowConnectionErrorSnackBar(getString(R.string.connection_error_message));
             }
 
             @Override
@@ -163,6 +173,7 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
 
         });
     }
+
 
 
     private void fillTweetsList(ArrayList<UserTimeline> allUserTimeLine) {
@@ -221,5 +232,17 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
                 mIsTheTitleContainerVisible = true;
             }
         }
+    }
+    public void ShowConnectionErrorSnackBar(String message) {
+        Snackbar snackbar = Snackbar
+                .make(coordinateLayoutUserProfile, message, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry_label, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showSelectedUserTweets(currentFollowedUser.getId(), currentTwitterUser.getId(), currentTwitterUser.getName(), 10, SharedPreferencesHelper.getAuthenticationToken(FollowerUserProfileActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowerUserProfileActivity.this));
+                    }
+                });
+
+        snackbar.show();
     }
 }

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -50,11 +52,11 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
     private TwitterUser currentTwitterUser;
     private RecyclerView recFollowersList;
     private SwipeRefreshLayout swipeRefreshLayoutFollowersList;
-    private long cursor;
     private long nextCursor;
     private TwitterFollowersUsersAdapter twitterFollowersUsersAdapter;
     private View progressIndecator;
     private View circularProgressLoadingFirstTime;
+    private CoordinatorLayout coordinateLayoutFollowers;
 
     public void setProfileImage() {
         Target target = new Target() {
@@ -87,13 +89,14 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_followers);
+        coordinateLayoutFollowers = (CoordinatorLayout) findViewById(R.id.coordinate_layout_followers);
         currentTwitterUser = SharedPreferencesHelper.getSavedTwitterUserFrom(FollowersActivity.this);
         initToolBar(currentTwitterUser.getName());
         initFollowersRecycleList();
         initHorizontalLoadMoreProgressIndicator();
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_consumer_key), getString(R.string.twitter_consumer_secret));
         Fabric.with(this, new Twitter(authConfig));
-        cursor = -1;
+        nextCursor = -1;
         fillFollowersListFromCashing();
         showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), -1, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
 
@@ -154,16 +157,15 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
                     }
                 })
         );
-        recFollowersList.addOnScrollListener(new EndlessRecyclerViewScrollListener(llm) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount) {
-                progressIndecator.setVisibility(View.VISIBLE);
-                showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), nextCursor, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
-            }
-        });
+        addingOnScrollListener(llm);
     }
 
     private void showFollowers(long userID, String username, final long cursor, String authToken, String authSecret) {
+
+        if(!GeneralMethods.isNetworkAvailable(FollowersActivity.this)){
+            ShowConnectionErrorSnackBar(getString(R.string.no_internet_connection_error_message));
+            return;
+        }
 //         GeneralMethods.printLog("ddd",result.data.getUserName()+"-"+ result.data.getUserId());
         swipeRefreshLayoutFollowersList.setRefreshing(true);
         TwitterAuthToken twitterAuthToken = new TwitterAuthToken(authToken, authSecret);
@@ -175,11 +177,12 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
             @Override
             public void failure(TwitterException arg0) {
                 // TODO Auto-generated method stub
-                GeneralMethods.printLog("====failure", arg0.getMessage());
-                Toast.makeText(FollowersActivity.this, arg0.getMessage(), Toast.LENGTH_LONG).show();
+                GeneralMethods.printLog("====failure", arg0.getLocalizedMessage());
                 swipeRefreshLayoutFollowersList.setRefreshing(false);
                 progressIndecator.setVisibility(View.GONE);
                 circularProgressLoadingFirstTime.setVisibility(View.GONE);
+                Toast.makeText(FollowersActivity.this, arg0.getMessage(), Toast.LENGTH_LONG).show();
+                ShowConnectionErrorSnackBar(getString(R.string.connection_error_message));
             }
 
             @Override
@@ -242,6 +245,16 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         circularProgressLoadingFirstTime.setVisibility(View.GONE);
     }
 
+    private void addingOnScrollListener(LinearLayoutManager llm) {
+        recFollowersList.addOnScrollListener(new EndlessRecyclerViewScrollListener(llm) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount) {
+                progressIndecator.setVisibility(View.VISIBLE);
+                showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), nextCursor, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
+            }
+        });
+    }
+
     private void addFollowingResponseToCash(FollowersResult response) {
         try {
             InternalStorage.addTwitterFollowesWriteObject(FollowersActivity.this, currentTwitterUser.getScreenName(), response);
@@ -252,7 +265,20 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
 
     @Override
     public void onRefresh() {
-        cursor = -1;
-        showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), cursor, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
+        nextCursor = -1;
+        showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), nextCursor, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
+    }
+
+    public void ShowConnectionErrorSnackBar(String message) {
+        Snackbar snackbar = Snackbar
+                .make(coordinateLayoutFollowers, message, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.retry_label, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showFollowers(currentTwitterUser.getId(), currentTwitterUser.getName(), nextCursor, SharedPreferencesHelper.getAuthenticationToken(FollowersActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowersActivity.this));
+                    }
+                });
+
+        snackbar.show();
     }
 }

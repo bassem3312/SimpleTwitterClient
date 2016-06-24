@@ -17,6 +17,8 @@ public class SharedPreferencesHelper {
     private static final String USER_BACKGROUND_IMAGE_URL_FLAG = "USER_BACKGROUND_IMAGE_URL_FLAG";
     private static final String AUTH_TOKEN_FLAG = "AUTH_TOKEN_FLAG";
     private static final String AUTH_SECRET_FLAG = "AUTH_SECRET_FLAG";
+    private static final String bio_FLAG = "bio_FLAG";
+    private static final String FULL_NAME_FLAG = "FULL_NAME_FLAG";
 
 
     /**
@@ -26,15 +28,20 @@ public class SharedPreferencesHelper {
      * @param userID
      * @param email
      * @param username
-     * @param isLoggedIN
+     * @param fullName
+     * @param bio
      * @param userProfileImageURL
      * @param userBackgroundImageURL
+     * @param isLoggedIN
      */
-    public static void putUserData(Activity context, long userID, String email, String username, boolean isLoggedIN, String userProfileImageURL, String userBackgroundImageURL) {
+    public static void putUserData(Activity context, long userID, String email, String fullName, String username, String bio, String userProfileImageURL, String userBackgroundImageURL, boolean isLoggedIN) {
         SharedPreferences sp = context.getSharedPreferences(CREDENTIAL_PREFERENCE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean(IS_LOGEDIN_FLAG, isLoggedIN);
         editor.putLong(USER_ID_FLAG, userID);
+        if (fullName != null && !fullName.isEmpty()) {
+            editor.putString(FULL_NAME_FLAG, fullName);
+        }
         if (username != null && !username.isEmpty()) {
             editor.putString(USER_NAME_FLAG, username);
         }
@@ -43,6 +50,9 @@ public class SharedPreferencesHelper {
         }
         if (userBackgroundImageURL != null && !userBackgroundImageURL.isEmpty()) {
             editor.putString(USER_BACKGROUND_IMAGE_URL_FLAG, userBackgroundImageURL);
+        }
+        if (bio != null && !bio.isEmpty()) {
+            editor.putString(bio_FLAG, bio);
         }
         if (email != null && !email.isEmpty()) {
             editor.putString(EMAIL_FLAG, email);
@@ -86,16 +96,17 @@ public class SharedPreferencesHelper {
         }
         SharedPreferences spUser = context.getSharedPreferences(CREDENTIAL_PREFERENCE_NAME, Context.MODE_PRIVATE);
         TwitterUser savedTwitterUser = new TwitterUser();
-        savedTwitterUser.setUserID(spUser.getLong(USER_NAME_FLAG, -1));
-        savedTwitterUser.setUsername(spUser.getString(USER_NAME_FLAG, ""));
+        savedTwitterUser.setId(spUser.getLong(USER_ID_FLAG, -1));
+        savedTwitterUser.setScreenName(spUser.getString(USER_NAME_FLAG, ""));
+        savedTwitterUser.setName(spUser.getString(FULL_NAME_FLAG, ""));
+        savedTwitterUser.setDescription(spUser.getString(bio_FLAG, ""));
         savedTwitterUser.setEmail(spUser.getString(EMAIL_FLAG, ""));
-        savedTwitterUser.setProfileImageURL(spUser.getString(USER_PROFILE_IMAGE_URL_FLAG, ""));
-        savedTwitterUser.setBackgroundImageURL(spUser.getString(USER_BACKGROUND_IMAGE_URL_FLAG, ""));
+        savedTwitterUser.setProfileImageUrl(spUser.getString(USER_PROFILE_IMAGE_URL_FLAG, ""));
+        savedTwitterUser.setProfileBackgroundImageUrl(spUser.getString(USER_BACKGROUND_IMAGE_URL_FLAG, ""));
         return savedTwitterUser;
     }
 
     /**
-     *
      * @param context
      * @return Twitter Authentication Token Key.
      */
@@ -105,7 +116,6 @@ public class SharedPreferencesHelper {
     }
 
     /**
-     *
      * @param context
      * @return Twitter Authentication Secret Key.
      */

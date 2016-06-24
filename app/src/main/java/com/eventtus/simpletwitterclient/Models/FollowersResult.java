@@ -3,6 +3,7 @@ package com.eventtus.simpletwitterclient.Models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 
 
-public class FollowersResult {
+public class FollowersResult implements Serializable {
 
     @SerializedName("users")
     private List<TwitterUser> users = new ArrayList<TwitterUser>();
