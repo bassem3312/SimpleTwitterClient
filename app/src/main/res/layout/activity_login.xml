@@ -7,11 +7,26 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity">
+    tools:context=".views.LoginActivity">
 
-    <com.twitter.sdk.android.core.identity.TwitterLoginButton
-        android:id="@+id/login_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="40dp"
+            android:gravity="center"
+            android:text="@string/login_welcome_message" />
+
+        <com.twitter.sdk.android.core.identity.TwitterLoginButton
+            android:id="@+id/login_button"
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </RelativeLayout>

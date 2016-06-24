@@ -62,6 +62,7 @@
             android:layout_marginTop="15dp"
             android:layout_toRightOf="@id/img_user_profile"
             android:text="bio"
+            android:gravity="start"
             android:textColor="@color/tw__medium_gray"
             android:textSize="7pt" />
 

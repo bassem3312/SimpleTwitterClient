@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SimpleTwitterClient</string>
+    <string name="connection_error_message">Connection Error</string>
+    <string name="login_welcome_message">Welcome to our sample application\n\nYou can login with your twitter ac count to display your followers.</string>
     <string name="twitter_consumer_key">cm8I6trvcbnVVRVBnhBRdiHiC</string>
     <string name="twitter_consumer_secret">8bKaQc7E8kYsU3Vs6DJBJ5Ehv9SAWBIbuQ6XKkc4ASZPTOxG6N</string>
 </resources>

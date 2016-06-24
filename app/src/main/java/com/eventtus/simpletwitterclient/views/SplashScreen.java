@@ -33,7 +33,6 @@ public class SplashScreen extends Activity {
 
     private void openNextScreen() {
         if (SharedPreferencesHelper.isLoggedIN(SplashScreen.this)) {
-            GeneralMethods.printLog("====", "ISLogedIN");
             GeneralMethods.openFollowersActivity(SplashScreen.this);
         } else {
             Intent nextIntent = new Intent(SplashScreen.this, LoginActivity.class);

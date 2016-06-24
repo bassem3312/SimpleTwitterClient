@@ -48,8 +48,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void success(Result<TwitterSession> result) {
                 // Do something with result, which provides a TwitterSession for making API calls
-                GeneralMethods.printLog("User Name", result.data.getUserName());
-                GeneralMethods.printLog("User ID", result.data.getUserId() + "");
+                GeneralMethods.printLog("TwitterUser Name", result.data.getUserName());
+                GeneralMethods.printLog("TwitterUser ID", result.data.getUserId() + "");
 
                 // get session authToken/authSecret Keys and save them in shared preferences.
                 TwitterSession session = Twitter.getSessionManager().getActiveSession();
@@ -74,7 +74,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Read Twitter User Email
+     * Read Twitter TwitterUser Email
+     *
      * @param resultSession Twitter user session
      */
     private void readTwitterUserEmail(TwitterSession resultSession) {
@@ -103,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                 new Callback<User>() {
                     @Override
                     public void success(Result<User> result) {
-                        GeneralMethods.printLog("twitter community", "user's profile url is "+ result.data.profileImageUrlHttps);
+                        GeneralMethods.printLog("twitter community", "user's profile url is " + result.data.profileImageUrlHttps);
                         saveTwitterUserData(result.data, userEmail);
                     }
 
@@ -118,6 +119,8 @@ public class LoginActivity extends AppCompatActivity {
     private void saveTwitterUserData(User currentUser, String useremail) {
         long userID = currentUser.getId();
         String userName = currentUser.screenName;
+        String fullName = currentUser.name;
+        String bio = currentUser.description;
         GeneralMethods.printLog("=====", currentUser.profileImageUrl);
         String profileImageURL = currentUser.profileImageUrl.replace("_normal", "");
         String backgroundImageURL = currentUser.profileBannerUrl + "/mobile_retina";
@@ -125,12 +128,15 @@ public class LoginActivity extends AppCompatActivity {
             useremail = userName + "@twitter.com";
         }
 
-        GeneralMethods.printLog("User ID", userID + "");
-        GeneralMethods.printLog("Name", userName);
+        GeneralMethods.printLog("TwitterUser ID", userID + "");
+        GeneralMethods.printLog("userName", userName);
+        GeneralMethods.printLog("fullName", fullName);
+        GeneralMethods.printLog("bio", bio);
         GeneralMethods.printLog("email", useremail);
         GeneralMethods.printLog("Profile Image URL", profileImageURL);
         GeneralMethods.printLog("banner Image https", backgroundImageURL);
-        SharedPreferencesHelper.putUserData(LoginActivity.this, userID, useremail, userName, true, profileImageURL, backgroundImageURL);
+        SharedPreferencesHelper.putUserData(LoginActivity.this, userID, useremail, fullName, userName, bio, profileImageURL, backgroundImageURL, true);
+        GeneralMethods.openFollowersActivity(LoginActivity.this);
     }
 
     private void showFollowers(long userID, String username, String authToken, String authSecret) {

@@ -7,7 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
 
     <style name="AppThemeWithoutWindowsActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -17,9 +17,12 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
     </style>
-
+    <style name="WindowAnimationTransition">
+        <item name="android:windowEnterAnimation">@android:anim/slide_in_left</item>
+        <item name="android:windowExitAnimation">@android:anim/slide_out_right</item>
+    </style>
     <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@android:color/white</item>
@@ -44,7 +47,6 @@
         <item name="spb_speed">1.7</item>
         <item name="spb_progressiveStart_speed">2</item>
         <item name="spb_progressiveStop_speed">3.4</item>
-        <item name="spb_interpolator">spb_interpolator_acceleratedecelerate</item>
         <item name="spb_mirror_mode">true</item>
         <item name="spb_reversed">true</item>
         <item name="spb_colors">@array/horizontal_progress_colors</item>
