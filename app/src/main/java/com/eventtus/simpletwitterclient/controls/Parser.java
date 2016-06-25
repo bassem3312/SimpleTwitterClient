@@ -14,6 +14,11 @@ import java.util.ArrayList;
  * Created by Bassam on 6/23/2016.
  */
 public class Parser {
+    /**
+     * Status TimeLine API Parser
+     * @param result
+     * @return arraylist of user time line.
+     */
     public ArrayList<UserTimeline> parseStatusesTimeLine(String result) {
         GeneralMethods.printLog("Response is>>>>>>>>>", result);
         ArrayList<UserTimeline> allTweets = new ArrayList<>();
@@ -39,13 +44,6 @@ public class Parser {
             }
             return allTweets;
 
-//            JSONArray ids = obj.getJSONArray("users");
-//            //This is where we get ids of followers
-//            for (int i = 0; i < ids.length(); i++) {
-//                GeneralMethods.printLog("ddd", "Id of user " + (i + 1) + " is " + ids.getJSONObject(i).getString("name"));
-//            }
-//            String nextCursor = obj.getString("next_cursor_str");
-//            GeneralMethods.printLog("====next_cursor_str", nextCursor);
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

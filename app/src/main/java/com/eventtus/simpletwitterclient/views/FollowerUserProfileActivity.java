@@ -74,16 +74,23 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
         initToolBar(currentFollowedUser.getName());
         initImageProfile();
         initLoadingFirstTime();
-        initTweetsRecycleList();
+        initTweetsRecyclerList();
         showSelectedUserTweets(currentFollowedUser.getId(), currentTwitterUser.getId(), currentTwitterUser.getName(), 10, SharedPreferencesHelper.getAuthenticationToken(FollowerUserProfileActivity.this), SharedPreferencesHelper.getAuthenticationSecret(FollowerUserProfileActivity.this));
 
     }
 
+    /**
+     * init first time loading indecator.
+     */
     private void initLoadingFirstTime() {
         circularProgressLoadingFirstTime = findViewById(R.id.progress_first_time_loading);
         circularProgressLoadingFirstTime.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * profile image view and set it by profile image url.
+     * init
+     */
     private void initImageProfile() {
         imgProfile = (ImageView) findViewById(R.id.imgv_user_Profile);
         final int radius = 15;
@@ -91,6 +98,11 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
         final Transformation transformation = new RoundedCornersTransformation(radius, margin);
         Picasso.with(FollowerUserProfileActivity.this).load(currentFollowedUser.getProfileImageUrl()).transform(transformation).placeholder(R.drawable.ic_profile_dummy).into(imgProfile);
     }
+
+    /**
+     * init activity toolbar and set follower full name
+     * * @param title
+     */
 
     public void initToolBar(String title) {
         toolbar = (Toolbar) findViewById(R.id.toolbar_followers_list);
@@ -110,7 +122,10 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
 
     }
 
-    private void initTweetsRecycleList() {
+    /**
+     * init RecyclerView list of tweets .
+     */
+    private void initTweetsRecyclerList() {
         lstTweets = (RecyclerView) findViewById(R.id.list_tweets);
         lstTweets.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -120,8 +135,17 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
 
     }
 
+    /**
+     * get user tweets for twitter API.
+     * @param followerID
+     * @param userID
+     * @param username
+     * @param count
+     * @param authToken
+     * @param authSecret
+     */
     private void showSelectedUserTweets(long followerID, long userID, String username, final long count, String authToken, String authSecret) {
-        if(!GeneralMethods.isNetworkAvailable(FollowerUserProfileActivity.this)){
+        if (!GeneralMethods.isNetworkAvailable(FollowerUserProfileActivity.this)) {
             ShowConnectionErrorSnackBar(getString(R.string.no_internet_connection_error_message));
             return;
         }
@@ -160,20 +184,12 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
                 }
 
                 String result = sb.toString();
-                GeneralMethods.printLog("=====Results", result);
                 ArrayList<UserTimeline> allUserTimeline = new Parser().parseStatusesTimeLine(result);
                 fillTweetsList(allUserTimeline);
-                for (int i = 0; i < allUserTimeline.size(); i++) {
-                    GeneralMethods.printLog("=====text", allUserTimeline.get(i).getText());
-                    GeneralMethods.printLog("=====user", allUserTimeline.get(i).getCurrentTwitterUser().getName());
-                    GeneralMethods.printLog("=====image", allUserTimeline.get(i).getCurrentTwitterUser().getProfileImageUrl());
-                }
-
             }
 
         });
     }
-
 
 
     private void fillTweetsList(ArrayList<UserTimeline> allUserTimeLine) {
@@ -182,6 +198,12 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
         circularProgressLoadingFirstTime.setVisibility(View.GONE);
     }
 
+    /**
+     * set image profile animation while scrolling.
+     * @param v
+     * @param duration
+     * @param visibility
+     */
     public void startAlphaAnimation(final View v, long duration, final int visibility) {
         AlphaAnimation alphaAnimation = (visibility == View.VISIBLE)
                 ? new AlphaAnimation(0f, 1f)
@@ -217,7 +239,6 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
         float percentage = (float) Math.abs(offset) / (float) maxScroll;
 
         handleAlphaOnTitle(percentage);
-//        handleToolbarTitleVisibility(percentage);
     }
 
     private void handleAlphaOnTitle(float percentage) {
@@ -233,6 +254,7 @@ public class FollowerUserProfileActivity extends AppCompatActivity implements Ap
             }
         }
     }
+
     public void ShowConnectionErrorSnackBar(String message) {
         Snackbar snackbar = Snackbar
                 .make(coordinateLayoutUserProfile, message, Snackbar.LENGTH_INDEFINITE)

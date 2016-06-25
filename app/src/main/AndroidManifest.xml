@@ -22,7 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.LoginActivity" />
+        <activity
+            android:name=".views.LoginActivity"
+            />
         <activity
             android:name=".views.FollowersActivity"
             android:theme="@style/AppThemeWithoutWindowsActionBar" />

@@ -13,6 +13,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -58,11 +60,13 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
     private View circularProgressLoadingFirstTime;
     private CoordinatorLayout coordinateLayoutFollowers;
 
+    /**
+     * load and Set image profile into toolbar logo image view.
+     */
     public void setProfileImage() {
         Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Log.e("HIYA", "onBitmapLoaded");
                 Bitmap b = Bitmap.createScaledBitmap(bitmap, 120, 120, false);
                 BitmapDrawable icon = new BitmapDrawable(toolbar.getResources(), b);
                 toolbar.setLogo(icon);
@@ -82,6 +86,7 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         };
         Picasso.with(toolbar.getContext())
                 .load(currentTwitterUser.getProfileImageUrl())
+                .placeholder(R.drawable.ic_profile_dummy)
                 .into(target);
     }
 
@@ -120,6 +125,11 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
 
     }
 
+    /**
+     * init activity toolbar and set title of it (full name).
+     *
+     * @param title
+     */
     public void initToolBar(String title) {
         toolbar = (Toolbar) findViewById(R.id.toolbar_followers_list);
         toolbar.setTitle(title);
@@ -135,6 +145,9 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
         );
     }
 
+    /**
+     *init followers RecyclerView and swipe to refresh  layout.
+     */
     private void initFollowersRecycleList() {
         swipeRefreshLayoutFollowersList = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout_followers_list);
         swipeRefreshLayoutFollowersList.setOnRefreshListener(FollowersActivity.this);
@@ -149,20 +162,35 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
                     @Override
                     public void onItemClick(View view, int position) {
                         // TODO Handle item click
-                        GeneralMethods.printLog("=====", "item selected" + position);
-                        TwitterUser selectedTwitterUser = twitterFollowersUsersAdapter.getTwittersList(position);
-                        Intent intentSelectedUserProfile = new Intent(FollowersActivity.this, FollowerUserProfileActivity.class);
-                        intentSelectedUserProfile.putExtra(FollowerUserProfileActivity.SELECTED_USER_FLAG, selectedTwitterUser);
-                        FollowersActivity.this.startActivity(intentSelectedUserProfile);
+                        onListItemClick(position);
                     }
                 })
         );
         addingOnScrollListener(llm);
     }
 
+    /**
+     * handle on item list click listener action.
+     * @param position
+     */
+    private void onListItemClick(int position) {
+        TwitterUser selectedTwitterUser = twitterFollowersUsersAdapter.getTwittersList(position);
+        Intent intentSelectedUserProfile = new Intent(FollowersActivity.this, FollowerUserProfileActivity.class);
+        intentSelectedUserProfile.putExtra(FollowerUserProfileActivity.SELECTED_USER_FLAG, selectedTwitterUser);
+        FollowersActivity.this.startActivity(intentSelectedUserProfile);
+    }
+
+    /**
+     * get followers List from twitter public api
+     * @param userID
+     * @param username
+     * @param cursor
+     * @param authToken
+     * @param authSecret
+     */
     private void showFollowers(long userID, String username, final long cursor, String authToken, String authSecret) {
 
-        if(!GeneralMethods.isNetworkAvailable(FollowersActivity.this)){
+        if (!GeneralMethods.isNetworkAvailable(FollowersActivity.this)) {
             ShowConnectionErrorSnackBar(getString(R.string.no_internet_connection_error_message));
             return;
         }
@@ -188,47 +216,40 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
             @Override
             public void success(Result<Response> arg0) {
                 // TODO Auto-generated method stub
-                BufferedReader reader = null;
-                StringBuilder sb = new StringBuilder();
-                try {
-                    reader = new BufferedReader(new InputStreamReader(arg0.response.getBody().in()));
-                    String line;
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                String result = sb.toString();
-                applyFollowersParsersAndFillList(result, cursor);
-/**
- * If we want to parse json response manually.
- */
-//                try {
-//                    JSONObject obj = new JSONObject(result);
-//                    JSONArray ids = obj.getJSONArray("users");
-//                    //This is where we get ids of followers
-//                    for (int i = 0; i < ids.length(); i++) {
-//                        GeneralMethods.printLog("ddd", "Id of user " + (i + 1) + " is " + ids.getJSONObject(i).getString("name"));
-//                    }
-//                    String nextCursor = obj.getString("next_cursor_str");
-//                    GeneralMethods.printLog("====next_cursor_str", nextCursor);
-//                } catch (JSONException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
+               successTwitterFollowerList(arg0,cursor);
             }
 
         });
     }
 
+    /**
+     * parse result responce from follower list api.
+     * @param responseResult
+     * @param cursor
+     */
+    private void successTwitterFollowerList(Result<Response> responseResult, long cursor) {
+        BufferedReader reader = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            reader = new BufferedReader(new InputStreamReader(responseResult.response.getBody().in()));
+            String line;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String result = sb.toString();
+        applyFollowersParsersAndFillList(result, cursor);
+
+    }
+
     private void applyFollowersParsersAndFillList(String result, long cursor) {
-        GeneralMethods.printLog("Response is>>>>>>>>>", result);
         Gson gson = new Gson();
         FollowersResult response = gson.fromJson(result, FollowersResult.class);
 
@@ -257,7 +278,7 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
 
     private void addFollowingResponseToCash(FollowersResult response) {
         try {
-            InternalStorage.addTwitterFollowesWriteObject(FollowersActivity.this, currentTwitterUser.getScreenName(), response);
+            InternalStorage.addTwitterFollowersWriteObject(FollowersActivity.this, currentTwitterUser.getScreenName(), response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -280,5 +301,22 @@ public class FollowersActivity extends AppCompatActivity implements SwipeRefresh
                 });
 
         snackbar.show();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.followers_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.action_Logout){
+            SharedPreferencesHelper.logOut(FollowersActivity.this);
+            startActivity(new Intent(FollowersActivity.this,LoginActivity.class));
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

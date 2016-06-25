@@ -123,4 +123,11 @@ public class SharedPreferencesHelper {
         SharedPreferences spUser = context.getSharedPreferences(CREDENTIAL_PREFERENCE_NAME, Context.MODE_PRIVATE);
         return spUser.getString(AUTH_SECRET_FLAG, "");
     }
+
+    public static void logOut(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(CREDENTIAL_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(IS_LOGEDIN_FLAG, false);
+        editor.commit();
+    }
 }

@@ -18,17 +18,32 @@ public final class InternalStorage {
     private InternalStorage() {
     }
 
-    public static void addTwitterFollowesWriteObject(Context context, String key, Object object) throws IOException {
-        FileOutputStream fos = context.openFileOutput(key, Context.MODE_PRIVATE);
+    /**
+     * save twitter followers response in internal storage.
+     * @param context
+     * @param fileNamekey
+     * @param object
+     * @throws IOException
+     */
+    public static void addTwitterFollowersWriteObject(Context context, String fileNamekey, Object object) throws IOException {
+        FileOutputStream fos = context.openFileOutput(fileNamekey, Context.MODE_PRIVATE);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
         oos.writeObject(object);
         oos.close();
         fos.close();
     }
 
-    public static Object readObject(Context context, String key) throws IOException,
+    /**
+     * retrieve cashed followers from internal storage.
+     * @param context
+     * @param fileNameKey
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static Object readObject(Context context, String fileNameKey) throws IOException,
             ClassNotFoundException {
-        FileInputStream fis = context.openFileInput(key);
+        FileInputStream fis = context.openFileInput(fileNameKey);
         ObjectInputStream ois = new ObjectInputStream(fis);
         Object object = ois.readObject();
         return object;
